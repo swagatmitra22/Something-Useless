@@ -1,8 +1,10 @@
+"use client"
+
 import type React from "react"
 import { useState } from "react"
 import styled from "styled-components"
 import { motion, AnimatePresence } from "framer-motion"
-import { geminiService } from './services/geminiService'; // Import the real service
+import { geminiService } from "./services/geminiService"
 import {
   Search,
   ArrowLeft,
@@ -16,6 +18,8 @@ import {
   Star,
   Award,
   MapPin,
+  ExternalLink,
+  Download,
 } from "lucide-react"
 
 function App() {
@@ -23,6 +27,7 @@ function App() {
   const [response, setResponse] = useState("")
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) return
@@ -31,11 +36,10 @@ function App() {
     setHasSearched(true)
 
     try {
-      // Use the real Gemini service instead of mock
       const result = await geminiService.searchPortfolio(searchQuery)
       setResponse(result)
     } catch (error) {
-      console.error('Search error:', error)
+      console.error("Search error:", error)
       setResponse("I apologize, but I'm having trouble processing your request right now. Please try again later.")
     } finally {
       setLoading(false)
@@ -63,23 +67,45 @@ function App() {
   ]
 
   const skills = [
-    { name: "Python", level: "Advanced", icon: "🐍", color: "#3776ab" },
-    { name: "AI/ML", level: "Advanced", icon: "🤖", color: "#ff6b6b" },
-    { name: "React", level: "Advanced", icon: "⚛️", color: "#61dafb" },
-    { name: "Node.js", level: "Advanced", icon: "🟢", color: "#68a063" },
-    { name: "C/C++", level: "Advanced", icon: "⚡", color: "#00599c" },
-    { name: "SQL", level: "Advanced", icon: "🗄️", color: "#336791" },
+    { name: "Python", level: "Advanced", icon: "🐍", color: "#3776ab", percentage: 95 },
+    { name: "AI/ML", level: "Advanced", icon: "🤖", color: "#ff6b6b", percentage: 90 },
+    { name: "React", level: "Advanced", icon: "⚛️", color: "#61dafb", percentage: 88 },
+    { name: "Node.js", level: "Advanced", icon: "🟢", color: "#68a063", percentage: 85 },
+    { name: "C/C++", level: "Advanced", icon: "⚡", color: "#00599c", percentage: 82 },
+    { name: "SQL", level: "Advanced", icon: "🗄️", color: "#336791", percentage: 80 },
   ]
 
   const achievements = [
-    { icon: Award, text: "Top 9% in Amazon ML Challenge 2024", color: "#ffd700" },
-    { icon: Star, text: "200+ Competitive Programming Problems", color: "#ff6b6b" },
-    { icon: Code, text: "CGPA: 8.86/10 at VIT Chennai", color: "#4ecdc4" },
+    { icon: Award, text: "Top 9% in Amazon ML Challenge 2024", color: "#ffd700", metric: "2438 teams" },
+    { icon: Star, text: "200+ Competitive Programming Problems", color: "#ff6b6b", metric: "Multiple platforms" },
+    { icon: Code, text: "CGPA: 8.86/10 at VIT Chennai", color: "#4ecdc4", metric: "AI/ML Specialization" },
+  ]
+
+  const projects = [
+    {
+      name: "easyEdits",
+      description: "AI-powered video editing with prompt-based controls",
+      tech: ["FastAPI", "Vite", "FFmpeg", "OpenAI Whisper"],
+      color: "#667eea",
+    },
+    {
+      name: "VCHECK",
+      description: "Real-time ID recognition with 99% accuracy",
+      tech: ["Python", "YOLOv8", "EasyOCR", "Streamlit"],
+      color: "#764ba2",
+    },
+    {
+      name: "SONORIQ",
+      description: "Music community platform with social features",
+      tech: ["React", "Node.js", "Firebase", "Spotify API"],
+      color: "#f093fb",
+    },
   ]
 
   return (
     <AppContainer>
-      <BackgroundPattern />
+      <ParticleBackground />
+      <FloatingElements />
       <MainContent>
         <AnimatePresence mode="wait">
           {!hasSearched ? (
@@ -100,6 +126,7 @@ function App() {
                     <ProfileAvatar>
                       <AvatarText>SM</AvatarText>
                       <AvatarGlow />
+                      <StatusIndicator />
                     </ProfileAvatar>
                   </motion.div>
 
@@ -108,14 +135,20 @@ function App() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.6 }}
                   >
-                    <ProfileName>Swagat Mitra</ProfileName>
+                    <ProfileName>
+                      Swagat Mitra
+                      <VerifiedBadge>
+                        <Star size={16} fill="currentColor" />
+                      </VerifiedBadge>
+                    </ProfileName>
                     <ProfileTitle>
                       <Brain size={20} />
                       AI/ML Engineer & Full Stack Developer
                     </ProfileTitle>
                     <ProfileLocation>
                       <MapPin size={16} />
-                      VIT Chennai • Bengaluru
+                      VIT Chennai • Available for opportunities
+                      <StatusDot />
                     </ProfileLocation>
                   </motion.div>
 
@@ -139,14 +172,20 @@ function App() {
                       <ContactLink href="https://github.com/swagatmitra22" aria-label="GitHub">
                         <Github size={20} />
                         <span>GitHub</span>
+                        <ExternalLink size={14} />
                       </ContactLink>
                       <ContactLink href="https://linkedin.com/in/swagat-mitra" aria-label="LinkedIn">
                         <Linkedin size={20} />
                         <span>LinkedIn</span>
+                        <ExternalLink size={14} />
                       </ContactLink>
                       <ContactLink href="mailto:swagatmitra2004@gmail.com" aria-label="Email">
                         <Mail size={20} />
                         <span>Email</span>
+                      </ContactLink>
+                      <ContactLink href="#" aria-label="Download Resume">
+                        <Download size={20} />
+                        <span>Resume</span>
                       </ContactLink>
                     </ContactLinks>
                   </motion.div>
@@ -159,21 +198,69 @@ function App() {
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.6 + index * 0.1, duration: 0.4 }}
+                      whileHover={{ scale: 1.05, y: -5 }}
                     >
                       <StatCard>
-                        <achievement.icon size={24} style={{ color: achievement.color }} />
-                        <StatText>{achievement.text}</StatText>
+                        <StatIcon style={{ color: achievement.color }}>
+                          <achievement.icon size={24} />
+                        </StatIcon>
+                        <StatContent>
+                          <StatText>{achievement.text}</StatText>
+                          <StatMetric>{achievement.metric}</StatMetric>
+                        </StatContent>
+                        <StatGlow style={{ background: `${achievement.color}20` }} />
                       </StatCard>
                     </motion.div>
                   ))}
                 </StatsSection>
               </Header>
 
+              <ProjectsPreview>
+                <motion.div
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                >
+                  <SectionTitle>
+                    <Code size={24} />
+                    Featured Projects
+                  </SectionTitle>
+                  <ProjectsGrid>
+                    {projects.map((project, index) => (
+                      <motion.div
+                        key={project.name}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.9 + index * 0.1, duration: 0.4 }}
+                        whileHover={{ y: -8 }}
+                      >
+                        <ProjectCard>
+                          <ProjectHeader
+                            style={{ background: `linear-gradient(135deg, ${project.color}20, ${project.color}10)` }}
+                          >
+                            <ProjectName>{project.name}</ProjectName>
+                            <ProjectIcon style={{ color: project.color }}>
+                              <Code size={20} />
+                            </ProjectIcon>
+                          </ProjectHeader>
+                          <ProjectDescription>{project.description}</ProjectDescription>
+                          <TechStack>
+                            {project.tech.map((tech, techIndex) => (
+                              <TechBadge key={techIndex}>{tech}</TechBadge>
+                            ))}
+                          </TechStack>
+                        </ProjectCard>
+                      </motion.div>
+                    ))}
+                  </ProjectsGrid>
+                </motion.div>
+              </ProjectsPreview>
+
               <SkillsSection>
                 <motion.div
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
+                  transition={{ delay: 1.0, duration: 0.6 }}
                 >
                   <SectionTitle>
                     <Zap size={24} />
@@ -185,12 +272,32 @@ function App() {
                         key={skill.name}
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.8 + index * 0.1, duration: 0.4 }}
+                        transition={{ delay: 1.1 + index * 0.1, duration: 0.4 }}
+                        whileHover={{ scale: 1.05 }}
                       >
                         <SkillCard>
-                          <SkillIcon style={{ backgroundColor: `${skill.color}20` }}>{skill.icon}</SkillIcon>
-                          <SkillName>{skill.name}</SkillName>
-                          <SkillLevel>{skill.level}</SkillLevel>
+                          <SkillHeader>
+                            <SkillIcon style={{ backgroundColor: `${skill.color}20` }}>{skill.icon}</SkillIcon>
+                            <SkillInfo>
+                              <SkillName>{skill.name}</SkillName>
+                              <SkillLevel>{skill.level}</SkillLevel>
+                            </SkillInfo>
+                          </SkillHeader>
+                          <SkillProgress>
+                            <SkillBar>
+                              <SkillFill
+                                style={{
+                                  width: `${skill.percentage}%`,
+                                  background: `linear-gradient(90deg, ${skill.color}, ${skill.color}80)`,
+                                }}
+                                as={motion.div}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${skill.percentage}%` }}
+                                transition={{ delay: 1.2 + index * 0.1, duration: 1 }}
+                              />
+                            </SkillBar>
+                            <SkillPercentage>{skill.percentage}%</SkillPercentage>
+                          </SkillProgress>
                         </SkillCard>
                       </motion.div>
                     ))}
@@ -202,12 +309,16 @@ function App() {
                 <motion.div
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.9, duration: 0.6 }}
+                  transition={{ delay: 1.2, duration: 0.6 }}
                 >
                   <SearchHeader>
-                    <Sparkles size={28} />
+                    <SearchIconLarge>
+                      <Sparkles size={32} />
+                    </SearchIconLarge>
                     <SearchTitle>Ask AI About Me</SearchTitle>
-                    <SearchSubtitle>Get instant answers about my projects, skills, and experience</SearchSubtitle>
+                    <SearchSubtitle>
+                      Get instant, intelligent answers about my projects, skills, and experience
+                    </SearchSubtitle>
                   </SearchHeader>
 
                   <SearchForm onSubmit={handleSubmit}>
@@ -222,9 +333,26 @@ function App() {
                         onChange={(e) => setQuery(e.target.value)}
                         disabled={loading}
                       />
+                      <SearchInputGlow />
                     </SearchInputContainer>
-                    <SearchButton type="submit" disabled={loading || !query.trim()}>
-                      {loading ? "Searching..." : "Search"}
+                    <SearchButton
+                      type="submit"
+                      disabled={loading || !query.trim()}
+                      as={motion.button}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {loading ? (
+                        <>
+                          <LoadingSpinner />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search size={20} />
+                          Search
+                        </>
+                      )}
                     </SearchButton>
                   </SearchForm>
 
@@ -236,7 +364,8 @@ function App() {
                           key={index}
                           initial={{ scale: 0.95, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: 1 + index * 0.1, duration: 0.4 }}
+                          transition={{ delay: 1.3 + index * 0.1, duration: 0.4 }}
+                          whileHover={{ scale: 1.02 }}
                         >
                           <SuggestionButton
                             onClick={() => {
@@ -245,7 +374,9 @@ function App() {
                             }}
                           >
                             <SuggestionText>{suggestion}</SuggestionText>
-                            <Search size={16} />
+                            <SuggestionIcon>
+                              <Search size={16} />
+                            </SuggestionIcon>
                           </SuggestionButton>
                         </motion.div>
                       ))}
@@ -263,7 +394,12 @@ function App() {
               transition={{ duration: 0.6 }}
             >
               <ResultsHeader>
-                <BackButton onClick={handleNewSearch}>
+                <BackButton
+                  onClick={handleNewSearch}
+                  as={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <ArrowLeft size={20} />
                   New Search
                 </BackButton>
@@ -288,7 +424,7 @@ function App() {
               <ResponseContainer>
                 {loading ? (
                   <LoadingContainer>
-                    <LoadingSpinner />
+                    <LoadingSpinnerLarge />
                     <LoadingText>Processing your query...</LoadingText>
                     <LoadingSubtext>AI is analyzing my portfolio data</LoadingSubtext>
                   </LoadingContainer>
@@ -321,21 +457,56 @@ function App() {
   )
 }
 
-// All your existing styled components remain the same...
+// Enhanced Styled Components
 const AppContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e  50%, #0f3460 75%, #533483 100%);
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
   position: relative;
   overflow-x: hidden;
 `
 
-const BackgroundPattern = styled.div`
+const ParticleBackground = styled.div`
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
-  opacity: 0.4;
+    radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(102, 126, 234, 0.3) 0%, transparent 50%);
+  opacity: 0.6;
+  animation: float 20s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(1deg); }
+  }
+`
+
+const FloatingElements = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(255, 119, 198, 0.1));
+    animation: float 15s ease-in-out infinite;
+  }
+  
+  &::before {
+    top: 10%;
+    left: 10%;
+    animation-delay: -5s;
+  }
+  
+  &::after {
+    bottom: 10%;
+    right: 10%;
+    animation-delay: -10s;
+  }
 `
 
 const MainContent = styled.main`
@@ -364,8 +535,8 @@ const ProfileSection = styled.div`
 
 const ProfileAvatar = styled.div`
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   margin: 0 auto 2rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -376,7 +547,7 @@ const ProfileAvatar = styled.div`
 `
 
 const AvatarText = styled.span`
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
   color: white;
   z-index: 2;
@@ -388,8 +559,33 @@ const AvatarGlow = styled.div`
   border-radius: 50%;
   background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
   opacity: 0.7;
-  filter: blur(8px);
+  filter: blur(12px);
   z-index: 1;
+  animation: pulse 3s ease-in-out infinite;
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+`
+
+const StatusIndicator = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 3px solid white;
+  z-index: 3;
+  animation: pulse 2s infinite;
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
 `
 
 const ProfileName = styled.h1`
@@ -401,10 +597,25 @@ const ProfileName = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
   }
+`
+
+const VerifiedBadge = styled.div`
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #1a1a2e;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 `
 
 const ProfileTitle = styled.h2`
@@ -426,6 +637,14 @@ const ProfileLocation = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+`
+
+const StatusDot = styled.div`
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
 `
 
 const ProfileSubtitle = styled.p`
@@ -456,44 +675,86 @@ const ContactLink = styled.a`
   font-weight: 500;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 `
 
 const StatsSection = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
 `
 
 const StatCard = styled.div`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
-  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  backdrop-filter: blur(15px);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);
     transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   }
+`
+
+const StatIcon = styled.div`
+  flex-shrink: 0;
+`
+
+const StatContent = styled.div`
+  flex: 1;
 `
 
 const StatText = styled.p`
   color: white;
   font-weight: 600;
-  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 `
 
-const SkillsSection = styled.section`
+const StatMetric = styled.p`
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+`
+
+const StatGlow = styled.div`
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  border-radius: 20px;
+  transition: opacity 0.3s ease;
+`
+
+const ProjectsPreview = styled.section`
   margin-bottom: 4rem;
 `
 
@@ -509,21 +770,89 @@ const SectionTitle = styled.h3`
   gap: 0.5rem;
 `
 
+const ProjectsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+`
+
+const ProjectCard = styled.div`
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  }
+`
+
+const ProjectHeader = styled.div`
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`
+
+const ProjectName = styled.h4`
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+`
+
+const ProjectIcon = styled.div`
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+`
+
+const ProjectDescription = styled.p`
+  color: rgba(255, 255, 255, 0.8);
+  padding: 1.5rem;
+  line-height: 1.6;
+`
+
+const TechStack = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1.5rem 1.5rem;
+`
+
+const TechBadge = styled.span`
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+`
+
+const SkillsSection = styled.section`
+  margin-bottom: 4rem;
+`
+
 const SkillsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 `
 
 const SkillCard = styled.div`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 1.5rem;
-  text-align: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
   transition: all 0.3s ease;
 
   &:hover {
@@ -532,26 +861,63 @@ const SkillCard = styled.div`
   }
 `
 
+const SkillHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`
+
 const SkillIcon = styled.div`
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  margin: 0 auto 1rem;
+`
+
+const SkillInfo = styled.div`
+  flex: 1;
 `
 
 const SkillName = styled.div`
   color: white;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 `
 
 const SkillLevel = styled.div`
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+`
+
+const SkillProgress = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`
+
+const SkillBar = styled.div`
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+`
+
+const SkillFill = styled.div`
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s ease;
+`
+
+const SkillPercentage = styled.div`
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 40px;
 `
 
 const SearchSection = styled.section`
@@ -562,11 +928,13 @@ const SearchSection = styled.section`
 const SearchHeader = styled.div`
   text-align: center;
   margin-bottom: 3rem;
-  
-  svg {
-    color: #fbbf24;
-    margin-bottom: 1rem;
-  }
+`
+
+const SearchIconLarge = styled.div`
+  color: #fbbf24;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
 `
 
 const SearchTitle = styled.h2`
@@ -597,10 +965,11 @@ const SearchInputContainer = styled.div`
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
 `
 
 const SearchIcon = styled.div`
@@ -626,18 +995,36 @@ const SearchInput = styled.input`
   }
 `
 
+const SearchInputGlow = styled.div`
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+  border-radius: 20px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+
+  ${SearchInputContainer}:focus-within & {
+    opacity: 0.3;
+  }
+`
+
 const SearchButton = styled.button`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 1.25rem 2rem;
-  border-radius: 16px;
+  border-radius: 20px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 140px;
   box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -652,6 +1039,20 @@ const SearchButton = styled.button`
 
   @media (max-width: 768px) {
     width: 100%;
+  }
+`
+
+const LoadingSpinner = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 `
 
@@ -675,7 +1076,7 @@ const SuggestionsGrid = styled.div`
 const SuggestionButton = styled.button`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1rem 1.5rem;
   color: white;
   cursor: pointer;
@@ -697,6 +1098,16 @@ const SuggestionButton = styled.button`
 const SuggestionText = styled.span`
   font-size: 0.95rem;
   line-height: 1.4;
+  flex: 1;
+`
+
+const SuggestionIcon = styled.div`
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+
+  ${SuggestionButton}:hover & {
+    opacity: 1;
+  }
 `
 
 const ResultsHeader = styled.div`
@@ -748,7 +1159,7 @@ const ResultsTitle = styled.h1`
 const QueryDisplay = styled.div`
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -795,7 +1206,7 @@ const QueryText = styled.div`
 const ResponseContainer = styled.div`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -809,7 +1220,7 @@ const LoadingContainer = styled.div`
   padding: 3rem 2rem;
 `
 
-const LoadingSpinner = styled.div`
+const LoadingSpinnerLarge = styled.div`
   width: 48px;
   height: 48px;
   border: 4px solid #e2e8f0;
