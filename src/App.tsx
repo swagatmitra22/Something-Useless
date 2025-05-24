@@ -2,7 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import styled from "styled-components"
 import { motion, AnimatePresence } from "framer-motion"
-import { geminiService } from './services/geminiService';
+import { geminiService } from './services/geminiService'; // Import the real service
 import {
   Search,
   ArrowLeft,
@@ -18,31 +18,6 @@ import {
   MapPin,
 } from "lucide-react"
 
-// Mock Gemini service for demo purposes
-const mockGeminiService = {
-  searchPortfolio: async (query: string): Promise<string> => {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    if (query.toLowerCase().includes("programming") || query.toLowerCase().includes("languages")) {
-      return "I'm proficient in Python (Advanced), C/C++ (Advanced), SQL (Advanced), Java (Intermediate), and Kotlin (Basic). I've solved over 200 competitive programming problems and achieved top 9% in Amazon ML Challenge 2024 among 2438 teams."
-    }
-
-    if (query.toLowerCase().includes("easyedits") || query.toLowerCase().includes("video")) {
-      return "easyEdits is my AI-powered video editing tool that enables prompt-based editing. I developed it using FastAPI, Vite, FFmpeg, OpenAI Whisper, Google Gemini, and scenedetect. It features version control-style editing, allowing users to track and revert changes seamlessly, with automated transcriptions and scene detection."
-    }
-
-    if (query.toLowerCase().includes("experience") || query.toLowerCase().includes("internship")) {
-      return "I'm currently working as an Advanced Application Engineer Intern at Accenture India (May 2025 - Present) in Bengaluru. Previously, I was a Samsung PRISM Developer Intern at Samsung R&D Institute (June 2024 - May 2025), where I developed a plugin to detect energy smells in Kotlin Code for various IDEs."
-    }
-
-    if (query.toLowerCase().includes("vcheck") || query.toLowerCase().includes("id")) {
-      return "VCHECK is my ID Card Identification System using Real Time Video with almost 99% accuracy. Built with Python, PyData, YOLOv8, EasyOCR, and Streamlit. I implemented text detection using EasyOCR and created a custom dataset for ID card and shorts detection."
-    }
-
-    return `Based on your query about "${query}", I can tell you that I'm Swagat Mitra, an AI/ML Engineer and Full Stack Developer currently pursuing BTech in Computer Science & Engineering with specialization in AI & ML at VIT Chennai (CGPA: 8.86/10). I have experience with various technologies including Python, C/C++, ReactJS, NodeJS, Machine Learning, and more. Feel free to ask me about my specific projects, skills, or experience!`
-  },
-}
-
 function App() {
   const [query, setQuery] = useState("")
   const [response, setResponse] = useState("")
@@ -56,9 +31,11 @@ function App() {
     setHasSearched(true)
 
     try {
+      // Use the real Gemini service instead of mock
       const result = await geminiService.searchPortfolio(searchQuery)
       setResponse(result)
-    } catch {
+    } catch (error) {
+      console.error('Search error:', error)
       setResponse("I apologize, but I'm having trouble processing your request right now. Please try again later.")
     } finally {
       setLoading(false)
@@ -159,15 +136,15 @@ function App() {
                     transition={{ delay: 0.5, duration: 0.6 }}
                   >
                     <ContactLinks>
-                      <ContactLink href="#" aria-label="GitHub">
+                      <ContactLink href="https://github.com/swagatmitra22" aria-label="GitHub">
                         <Github size={20} />
                         <span>GitHub</span>
                       </ContactLink>
-                      <ContactLink href="#" aria-label="LinkedIn">
+                      <ContactLink href="https://linkedin.com/in/swagat-mitra" aria-label="LinkedIn">
                         <Linkedin size={20} />
                         <span>LinkedIn</span>
                       </ContactLink>
-                      <ContactLink href="#" aria-label="Email">
+                      <ContactLink href="mailto:swagatmitra2004@gmail.com" aria-label="Email">
                         <Mail size={20} />
                         <span>Email</span>
                       </ContactLink>
@@ -344,7 +321,7 @@ function App() {
   )
 }
 
-// Styled Components
+// All your existing styled components remain the same...
 const AppContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e  50%, #0f3460 75%, #533483 100%);
