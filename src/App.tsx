@@ -2,6 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import styled from "styled-components"
 import { motion, AnimatePresence } from "framer-motion"
+import { geminiService } from './services/geminiService';
 import {
   Search,
   ArrowLeft,
@@ -55,7 +56,7 @@ function App() {
     setHasSearched(true)
 
     try {
-      const result = await mockGeminiService.searchPortfolio(searchQuery)
+      const result = await geminiService.searchPortfolio(searchQuery)
       setResponse(result)
     } catch {
       setResponse("I apologize, but I'm having trouble processing your request right now. Please try again later.")
